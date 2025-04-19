@@ -1,4 +1,4 @@
-export default formattedTime() { 
+export default function formattedTime() { 
   var today = new Date();
   var dd = today.getDate();
 
@@ -8,6 +8,6 @@ export default formattedTime() {
   if(dd<10) dd='0'+dd;
   if(mm<10) mm='0'+mm; 
 
-  return `${dd}'-'${mm}'-'${yyyy}`;
+  return `${dd}-${mm}-${yyyy}`;
 }
 

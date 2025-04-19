@@ -2,7 +2,6 @@ import express from 'express';
 import http from 'http';
 import path from 'path';
 import helmet from 'helmet';
-import cors from 'cors';
 import rateLimit from 'express-rate-limit';
 import { fileURLToPath } from 'url';
 import { Server } from 'socket.io';
@@ -12,6 +11,10 @@ import { StringSession } from 'telegram/sessions/index.js';
 import input from 'input'; 
 import formattedTime from './formatTime.js'; 
 import fs from 'fs';
+import dotenv from 'dotenv'; 
+import basicAuth from 'express-basic-auth';
+
+dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -22,11 +25,10 @@ const server = http.createServer(app);
 const io = new Server(server);
 const PORT = process.env.PORT || 3000;
 
-const chatId = 'CHAT_ID';
-const botToken = process.env.BOT_TOKEN // Telegram bot Token
-const apiId = parseInt(process.env.API_ID); // Telegram API ID
-const apiHash = process.env.API_HASH; // Telegram API Hash
-let sessionString = process.env.STRING_SESSION || ''; // Your saved session string
+const botToken = process.env.BOT_TOKEN;
+const apiId = parseInt(process.env.API_ID); 
+const apiHash = process.env.API_HASH; 
+let sessionString = process.env.STRING_SESSION || '';
 
 let botActive = false;
 let sendTokens = 0;
@@ -38,16 +40,23 @@ let thresholds = {
   recipientBot: "",
   maxTrade: 10,
   slippageBps: 200,
-  tradeAmount: 1000000,
   pollInterval: (1000 * 30),
 };
+
+function sleep(minMs, maxMs) {
+  const delay = Math.floor(Math.random() * (maxMs - minMs + 1)) + minMs;
+  return new Promise(resolve => setTimeout(resolve, delay));
+}
 
 // Initialize the StringSession
 const stringSession = new StringSession(sessionString);
 
 // Create a new Telegram client instance
 const client = new TelegramClient(stringSession, apiId, apiHash, {
-  connectionRetries: 5,
+  connectionRetries: 5, 
+  appVersion:"2.7.1",
+  deviceModel:"PC",
+  systemVersion:"Windows 10"
 });
 
 // Async function to start the client and authenticate
@@ -78,16 +87,17 @@ const client = new TelegramClient(stringSession, apiId, apiHash, {
   }
 
   // Example: Send a message
-  await sendMessage('me', 'Hello from O_C Mining!');
+  // await sendMessage('me', 'Hello from O_C Mining!');
 })();
 
 // Function to send a message to a specified recipient
 async function sendMessage(messageText) {
   try {
     await client.sendMessage(thresholds.recipientBot, { message: messageText });
-    console.log(`Message sent to ${recipientBot}: "${messageText}"`);
+    // console.log(`Message sent to ${recipientBot}: "${messageText}"`);
   } catch (error) {
-    console.error('Error sending message:', error);
+    // console.error('Error sending message:', error);
+    io.emit('notification', {message: "err gramsjs"})
   }
 }
 
@@ -98,7 +108,7 @@ const sendNotification = (message) => {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      chat_id: chatId,
+      chat_id: process.env.CHAT_ID,
       text: message
     })
   })
@@ -112,11 +122,11 @@ const sendNotification = (message) => {
   })
   .catch(error => {
     console.error('Error:', error);
-    io.emit('notification', {message: error.message})
+    io.emit('notification', {message: `tel api: ${error.message}`})
   });
 };
 
-app.use(corse());
+// app.use(corse());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(helmet());
@@ -134,13 +144,11 @@ app.post('/thresholds', (req, res) => {
     return res.status(400).json({ error: 'Invalid tradeAmount value' });
   }
   thresholds = { ...thresholds, ...newThresholds };
-  sendNotification("settings changed");
+
+  sendNotification(`Settings have been changed. ${formattedTime()}`);
+
   io.emit('thresholdsUpdate', thresholds);
   res.json(thresholds);
-});
-
-app.get('/', (req, res) => {
-  res.render('dashboard', { toggleBot: botActive, thresholds });
 });
 
 app.get('/toggle-bot', (req, res) => {
@@ -148,13 +156,27 @@ app.get('/toggle-bot', (req, res) => {
      botActive = true;
      startAnalyzerLoop();
      io.emit('notification', { message: `✔️ Bot activated`});
-     sendNotification('Bot activated')
   } else {
      botActive = false;
-     io.emit('notification', { message: `✔️ Bot terminated`});
-     sendNotification('Bot terminated')
+     io.emit('notification', { message: `❌ Bot terminated`});
   }
   res.json({status: botActive});
+});
+
+app.get('/logout', (req, res) => {
+  res.status(401).send('You have been logged out.'); // Or redirect to login
+});
+
+app.use(basicAuth({
+    users: {
+        'user0': process.env.USER0,
+        'user1': process.env.USER1,
+    }, 
+    challenge: true
+}));
+
+app.get('/', (req, res) => {
+  res.render('dashboard', { toggleBot: botActive, thresholds });
 });
 
 app.get('/trades-history', (req, res) => {
@@ -172,7 +194,6 @@ async function verifyWithRugcheck(token) {
     return token;
   } catch (err) {
     io.emit('notification', { message: `⚠️ Error verifying token ${tokenAddress}: ${err.message}` });
-    sendNotification(`RugCheck: ${err.message}`)
     // console.error('Error verifying rug:', err);
     return false;
   }
@@ -207,7 +228,6 @@ function potentialAddresses(tokens) {
     const differenceInSeconds = now - createdAt;
 
     if (differenceInSeconds < 0) {
-      sendNotification(`Future timestamp for token: ${token.name || "unknown"} | Raw: ${token.pairCreatedAt}`);
       return false;
     }
 
@@ -223,7 +243,7 @@ function potentialAddresses(tokens) {
 
     return false;
   })
-  .map((token) => { name: token.baseToken.name, address: token.baseToken?.address } || { address: false });
+  .map((token) => ({ name: token.baseToken?.name, address: token.baseToken?.address }));
 }
 
 async function fetchTokenData() {
@@ -243,7 +263,6 @@ async function fetchTokenData() {
     return potentialAddresses(newTokens);
   } catch (err) {
     io.emit('notification', { message: `🚨 Error fetching token data: ${err.message}` });
-    sendNotification("Error fetching token on Dexscreener "+ err.message)
     // console.error('Error fetching token data:', err);
     return [];
   }
@@ -254,18 +273,20 @@ async function verifyTokens(tokens) {
     if (!token.address) continue;
     const result = await verifyWithRugcheck(token);
 
-    sendNotification(`Token with the name of ${token.name} mint address of ${token.address} is verified`);
-    io.emit('notification', { message: `Token with mint address of ${result} is verified`});
+    if (!result) {
+      io.emit('notification', { message: `❌ Token verification failed or flagged as rugged.` });
+      continue;
+    }
 
     if (sendTokens >= thresholds.maxTrade) {
       io.emit('notification', {message: "you have reached the max Trade threshold of " + thresholds.maxTrade})
-      sendNotification("you have reached the max Trade thresholds of " + thresholds.maxTrade + " autoTrade disabled")
+      sendNotification("Reached the max Trade thresholds of " + thresholds.maxTrade + " autoTrade disabled" + formattedTime())
       autoTradeEnabled = false;
       break;
     };
 
     try {
-      await client.sendMessage(result) 
+      await sendMessage(result) 
 
       fs.appendFileSync('history.txt', `
           Token name: ${token.name}\n
@@ -274,19 +295,16 @@ async function verifyTokens(tokens) {
       `, 'utf8');
     
       sendTokens++;
-      sendNotification(`🚀 ${token.name} with the address of '${token.address}' send to telegram bot successfully!`);
+      await sleep(4000, 8000);
       io.emit('notification', { message: `🚀 ${token.name} with address of '${token.address}' send to telegram bot successfully!` });
+      const msg = `🚀 ${token.name} (${formattedTime()})\nAddress: ${token.address}`;
+      await sendNotification(msg);
     } catch (err) {
-      sendNotification(`❌ failed to send ${token.name}: ${err.message}`);
       io.emit('notification', { message: `❌ failed to send ${token.name}: ${err.message}` });
     }
   }
 }
 
-io.on('connection', (socket) => {
-  sendNotification('bot has visitor')
-  socket.on('disconnect', () => sendNotification('visitor just left'));
-});
 
 async function runAnalyzer() {
   io.emit('notification', { message: '📊 Analyzing market data...' });

@@ -1,5 +1,18 @@
 const socket = io();
 
+document.querySelectorAll(".tab-btn").forEach(btn => {
+  btn.addEventListener("click", function () {
+    const tabId = this.getAttribute("data-tab");
+    tab(tabId);
+  });
+});
+
+function tab(id) {
+  id = Number(id);
+  document.getElementById("tab1").style.display = id === 1 ? "block" : "none";
+  document.getElementById("tab2").style.display = id === 2 ? "block" : "none";
+}
+
 const solInput = document.getElementById('tradeAmount');
 
 solInput.addEventListener('change', () => {
