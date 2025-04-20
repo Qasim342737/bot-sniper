@@ -1,6 +1,7 @@
 import express from 'express';
-import http from 'http';
 import path from 'path';
+import http from 'http';
+import https from 'https';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import { fileURLToPath } from 'url';
@@ -42,6 +43,12 @@ let thresholds = {
   slippageBps: 200,
   pollInterval: (1000 * 30),
 };
+
+const httpAgent = new https.Agent({
+  keepAlive: true,
+  maxSockets: 20,
+  timeout: 30000
+});
 
 function sleep(minMs, maxMs) {
   const delay = Math.floor(Math.random() * (maxMs - minMs + 1)) + minMs;
@@ -126,7 +133,6 @@ const sendNotification = (message) => {
   });
 };
 
-// app.use(corse());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(helmet());
@@ -185,7 +191,7 @@ app.get('/trades-history', (req, res) => {
 });
 
 async function verifyWithRugcheck(token) {
-  const url = `https://api.rugcheck.xyz/v1/tokens/${token.address}/report`;
+  const url = `https://api.rugcheck.xyz/v1/tokens/${token}/report`;
   try {
     const response = await robustFetch(url);
     if (!response.ok) throw new Error(`RugCheck API error: ${response.status}`);
@@ -199,11 +205,17 @@ async function verifyWithRugcheck(token) {
   }
 }
 
+
+const keepAliveAgent = new https.Agent({ keepAlive: true });
+
 async function robustFetch(url, options = {}) {
   return pRetry(
     async () => {
       try {
-        const res = await fetch(url, options);
+        const res = await fetch(url, {
+          ...options,
+          agent: keepAliveAgent
+        });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res;
       } catch (err) {
@@ -215,7 +227,7 @@ async function robustFetch(url, options = {}) {
 }
 
 function potentialAddresses(tokens) {
-  tokens.forEach(t => fetchedTokens.add(t.baseToken.address));
+  tokens.forEach(t => fetchedTokens.add(t.baseToken?.address));
   return tokens.filter((token) => {
     const now = Math.floor(Date.now() / 1000); // In seconds
     const fdv = token.fdv || 0;
@@ -243,7 +255,7 @@ function potentialAddresses(tokens) {
 
     return false;
   })
-  .map((token) => ({ name: token.baseToken?.name, address: token.baseToken?.address }));
+  .map((token) => ({ name: token?.baseToken?.name, address: token?.baseToken?.address }));
 }
 
 async function fetchTokenData() {
@@ -259,7 +271,7 @@ async function fetchTokenData() {
     const tokenResponse = await robustFetch(`https://api.dexscreener.com/tokens/v1/solana/${solanaTokens}`);
     if (!tokenResponse.ok) throw new Error(`DEXSCREENER_API_SOL error: ${tokenResponse.status}`);
     const solanaData = await tokenResponse.json();
-    const newTokens = solanaData.filter(t => !fetchedTokens.has(t.baseToken.address));;
+    const newTokens = solanaData.filter(t => !fetchedTokens.has(t.?baseToken?.address));;
     return potentialAddresses(newTokens);
   } catch (err) {
     io.emit('notification', { message: `🚨 Error fetching token data: ${err.message}` });
@@ -271,7 +283,7 @@ async function fetchTokenData() {
 async function verifyTokens(tokens) {
   for (const token of tokens) {
     if (!token.address) continue;
-    const result = await verifyWithRugcheck(token);
+    const result = await verifyWithRugcheck(token.address);
 
     if (!result) {
       io.emit('notification', { message: `❌ Token verification failed or flagged as rugged.` });
@@ -280,20 +292,19 @@ async function verifyTokens(tokens) {
 
     if (sendTokens >= thresholds.maxTrade) {
       io.emit('notification', {message: "you have reached the max Trade threshold of " + thresholds.maxTrade})
-      sendNotification("Reached the max Trade thresholds of " + thresholds.maxTrade + " autoTrade disabled" + formattedTime())
-      autoTradeEnabled = false;
+      sendNotification("Reached the max Trade thresholds of " + thresholds.maxTrade + " bot deactivated" + formattedTime())
+      botActive = false;
       break;
     };
 
     try {
       await sendMessage(result) 
 
-      fs.appendFileSync('history.txt', `
-          Token name: ${token.name}\n
-          Token address: ${token.address}\n
-          Timestamp: ${formattedTime()}\n\n\n
-      `, 'utf8');
-    
+      fs.appendFileSync('history.txt',
+       `Token Name: ${token.name}\nToken Address: ${token.address}\nTimestamp: ${formattedTime()}\n\n\n`,
+       'utf8'
+      );
+
       sendTokens++;
       await sleep(4000, 8000);
       io.emit('notification', { message: `🚀 ${token.name} with address of '${token.address}' send to telegram bot successfully!` });
