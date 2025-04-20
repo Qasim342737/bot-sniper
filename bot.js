@@ -157,18 +157,6 @@ app.post('/thresholds', (req, res) => {
   res.json(thresholds);
 });
 
-app.get('/toggle-bot', (req, res) => {
-  if (!botActive) {
-     botActive = true;
-     startAnalyzerLoop();
-     io.emit('notification', { message: `✔️ Bot activated`});
-  } else {
-     botActive = false;
-     io.emit('notification', { message: `❌ Bot terminated`});
-  }
-  res.json({status: botActive});
-});
-
 app.get('/logout', (req, res) => {
   res.status(401).send('You have been logged out.'); // Or redirect to login
 });
@@ -271,7 +259,7 @@ async function fetchTokenData() {
     const tokenResponse = await robustFetch(`https://api.dexscreener.com/tokens/v1/solana/${solanaTokens}`);
     if (!tokenResponse.ok) throw new Error(`DEXSCREENER_API_SOL error: ${tokenResponse.status}`);
     const solanaData = await tokenResponse.json();
-    const newTokens = solanaData.filter(t => !fetchedTokens.has(t.?baseToken?.address));;
+    const newTokens = solanaData.filter(t => !fetchedTokens.has(t.baseToken?.address));;
     return potentialAddresses(newTokens);
   } catch (err) {
     io.emit('notification', { message: `🚨 Error fetching token data: ${err.message}` });
@@ -299,8 +287,8 @@ async function verifyTokens(tokens) {
 
     try {
       await sendMessage(result) 
-
-      fs.appendFileSync('history.txt',
+      const historyPath = path.join(__dirname, 'public', 'history.txt');
+      fs.appendFileSync(historyPath,
        `Token Name: ${token.name}\nToken Address: ${token.address}\nTimestamp: ${formattedTime()}\n\n\n`,
        'utf8'
       );
@@ -318,9 +306,10 @@ async function verifyTokens(tokens) {
 
 
 async function runAnalyzer() {
+  if (!botActive) return;
   io.emit('notification', { message: '📊 Analyzing market data...' });
   const tokens = await fetchTokenData();
-  const verifiedTokens = await verifyTokens(tokens);
+  await verifyTokens(tokens);
 }
 
 async function startAnalyzerLoop() {
@@ -332,5 +321,18 @@ async function startAnalyzerLoop() {
     await new Promise((resolve) => setTimeout(resolve, delay));
   }
 }
+
+app.get('/toggle-bot', async (req, res) => {
+  if (!botActive) {
+     botActive = true;
+     await startAnalyzerLoop();
+     io.emit('notification', { message: `✔️ Bot activated`});
+  } else {
+     botActive = false;
+     io.emit('notification', { message: `❌ Bot terminated`});
+  }
+  res.json({status: botActive});
+});
+
 
 server.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
