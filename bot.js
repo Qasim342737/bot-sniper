@@ -38,7 +38,7 @@ let thresholds = {
   fdv: 30000,
   mc: 2000,
   age: 2,
-  recipientBot: "",
+  recipientBot: "@bonkbot_bot",
   maxTrade: 10,
   slippageBps: 200,
   pollInterval: (1000 * 30),
@@ -161,15 +161,15 @@ app.get('/logout', (req, res) => {
   res.status(401).send('You have been logged out.'); // Or redirect to login
 });
 
-app.use(basicAuth({
-    users: {
-        'user0': process.env.USER0,
-        'user1': process.env.USER1,
-    }, 
-    challenge: true
-}));
+const authMiddleware = basicAuth({
+  users: {
+    'user0': process.env.USER0,
+    'user1': process.env.USER1,
+  },
+  challenge: true
+});
 
-app.get('/', (req, res) => {
+app.get('/bot', authMiddleware, (req, res) => {
   res.render('dashboard', { toggleBot: botActive, thresholds });
 });
 
