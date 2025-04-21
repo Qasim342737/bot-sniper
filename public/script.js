@@ -13,18 +13,18 @@ function tab(id) {
   document.getElementById("tab2").style.display = id === 2 ? "block" : "none";
 }
 
-const solInput = document.getElementById('tradeAmount');
+// const solInput = document.getElementById('tradeAmount');
 
-solInput.addEventListener('change', () => {
-  const value = parseFloat(solInput.value);
-
-  if (!isNaN(value)) {
-    const lamports = Math.round(value * 1_000_000_000);
-    solInput.value = lamports; // Replace input value with lamports
-  } else {
-    solInput.value = '';
-  }
-});
+// solInput.addEventListener('change', () => {
+//   const value = parseFloat(solInput.value);
+//
+//   if (!isNaN(value)) {
+//     const lamports = Math.round(value * 1_000_000_000);
+//     solInput.value = lamports; // Replace input value with lamports
+//   } else {
+//     solInput.value = '';
+//   }
+// });
 
 // Activate Bot
 document.getElementById('toggleActivateBot').addEventListener('click', async () => {
@@ -46,22 +46,22 @@ document.getElementById('thresholdForm').addEventListener('submit', async (e) =>
         const formData = new FormData(e.target);
         const thresholds = {};
         formData.forEach((value, key) => {
-            thresholds[key] = Number(value);
+            thresholds[key] = value;
         });
-
+console.log(thresholds)
         const res = await fetch('/thresholds', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(thresholds)
         });
 
-        if (!res.ok) throw new Error('Network response was not ok');
+        if (!res.ok) throw new Error('Network response was not ok or incorrect password');
         const updatedThresholds = await res.json();
-        alert('updated')
-        console.log('Thresholds updated:', updatedThresholds);
+        alert('updated') 
+        // console.log('Thresholds updated:', updatedThresholds);
     } catch (error) {
-        console.error('Error updating thresholds:', error);
-        alert('Error updating thresholds');
+        // console.error('Error updating thresholds:', error);
+        alert(error.message);
     }
 });
 
