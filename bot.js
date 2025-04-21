@@ -55,7 +55,7 @@ function sleep(minMs, maxMs) {
   return new Promise(resolve => setTimeout(resolve, delay));
 }
 
-// Initialize the StringSession
+Initialize the StringSession
 const stringSession = new StringSession(sessionString);
 
 // Create a new Telegram client instance
@@ -133,6 +133,15 @@ const sendNotification = (message) => {
   });
 };
 
+const authMiddleware = basicAuth({
+  users: {
+    'user0': process.env.USER0,
+    'user1': process.env.USER1,
+  },
+  challenge: true,
+  unauthorizedResponse: 'Unauthorized access'
+});
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(helmet());
@@ -145,28 +154,22 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.post('/thresholds', (req, res) => {
-  const newThresholds = req.body;
-  if (typeof newThresholds.tradeAmount !== 'number' || newThresholds.tradeAmount <= 0) {
-    return res.status(400).json({ error: 'Invalid tradeAmount value' });
+  const pass = req.body.pass;
+  if (pass == process.env.USER0 || pass == process.env.USER1) {
+    const newThresholds = req.body;
+    thresholds = { ...thresholds, ...newThresholds };
+   
+    sendNotification(`Settings have been changed. ${formattedTime()}`);
+   
+    io.emit('thresholdsUpdate', thresholds);
+    res.json(thresholds);
+  } else { 
+    return res.status(401).send(req.body.pass);
   }
-  thresholds = { ...thresholds, ...newThresholds };
-
-  sendNotification(`Settings have been changed. ${formattedTime()}`);
-
-  io.emit('thresholdsUpdate', thresholds);
-  res.json(thresholds);
 });
 
 app.get('/logout', (req, res) => {
   res.status(401).send('You have been logged out.'); // Or redirect to login
-});
-
-const authMiddleware = basicAuth({
-  users: {
-    'user0': process.env.USER0,
-    'user1': process.env.USER1,
-  },
-  challenge: true
 });
 
 app.get('/bot', authMiddleware, (req, res) => {
@@ -309,7 +312,7 @@ async function runAnalyzer() {
   if (!botActive) return;
   io.emit('notification', { message: '📊 Analyzing market data...' });
   const tokens = await fetchTokenData();
-  await verifyTokens(tokens);
+  await verifyTokens(tokens); 
 }
 
 async function startAnalyzerLoop() {
@@ -322,10 +325,10 @@ async function startAnalyzerLoop() {
   }
 }
 
-app.get('/toggle-bot', async (req, res) => {
+app.get('/toggle-bot', (req, res) => {
   if (!botActive) {
      botActive = true;
-     await startAnalyzerLoop();
+     startAnalyzerLoop();
      io.emit('notification', { message: `✔️ Bot activated`});
   } else {
      botActive = false;
