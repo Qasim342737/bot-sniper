@@ -189,12 +189,13 @@ async function verifyWithRugcheck(token) {
   }
 }
 
-async function robustFetch(url, options = {}) {
+async function robustFetch(url) {
   return pRetry(
     async () => {
       try {
         const res = await fetch(url, {
-          ...options,
+           'User-Agent': 'Mozilla/5.0',
+           'Accept': 'application/json',
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res;
