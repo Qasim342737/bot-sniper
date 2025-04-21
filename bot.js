@@ -1,7 +1,6 @@
 import express from 'express';
 import path from 'path';
 import http from 'http';
-import https from 'https';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import { fileURLToPath } from 'url';
@@ -43,12 +42,6 @@ let thresholds = {
   slippageBps: 200,
   pollInterval: (1000 * 30),
 };
-
-const httpAgent = new https.Agent({
-  keepAlive: true,
-  maxSockets: 20,
-  timeout: 30000
-});
 
 function sleep(minMs, maxMs) {
   const delay = Math.floor(Math.random() * (maxMs - minMs + 1)) + minMs;
@@ -205,7 +198,6 @@ async function robustFetch(url, options = {}) {
       try {
         const res = await fetch(url, {
           ...options,
-          agent: keepAliveAgent
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res;
