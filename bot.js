@@ -174,6 +174,27 @@ app.get('/trades-history', (req, res) => {
   res.sendFile(filePath);
 });
 
+
+async function robustFetch(url) {
+  return pRetry(
+    async () => {
+      try {
+        const res = await fetch(url, { 
+           headers: {
+             'User-Agent': 'Mozilla/5.0',
+             'Accept': 'application/json',
+           },
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res;
+      } catch (err) {
+        throw new Error(`Network error: ${err.message}`);
+      }
+    },
+    { retries: 3, minTimeout: 1000, factor: 2 },
+  );
+} 
+
 async function verifyWithRugcheck(token) {
   const url = `https://api.rugcheck.xyz/v1/tokens/${token}/report`;
   try {
@@ -187,24 +208,6 @@ async function verifyWithRugcheck(token) {
     // console.error('Error verifying rug:', err);
     return false;
   }
-}
-
-async function robustFetch(url) {
-  return pRetry(
-    async () => {
-      try {
-        const res = await fetch(url, {
-           'User-Agent': 'Mozilla/5.0',
-           'Accept': 'application/json',
-        });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return res;
-      } catch (err) {
-        throw new Error(`Network error: ${err.message}`);
-      }
-    },
-    { retries: 3, minTimeout: 1000, factor: 2 },
-  );
 }
 
 function potentialAddresses(tokens) {
