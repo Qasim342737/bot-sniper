@@ -55,7 +55,7 @@ function sleep(minMs, maxMs) {
   return new Promise(resolve => setTimeout(resolve, delay));
 }
 
-Initialize the StringSession
+// Initialize the StringSession
 const stringSession = new StringSession(sessionString);
 
 // Create a new Telegram client instance
