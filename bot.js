@@ -189,9 +189,6 @@ async function verifyWithRugcheck(token) {
   }
 }
 
-
-const keepAliveAgent = new https.Agent({ keepAlive: true });
-
 async function robustFetch(url, options = {}) {
   return pRetry(
     async () => {
@@ -212,7 +209,7 @@ async function robustFetch(url, options = {}) {
 function potentialAddresses(tokens) {
   tokens.forEach(t => fetchedTokens.add(t.baseToken?.address));
   return tokens.filter((token) => {
-    const now = Math.floor(Date.now() / 1000); // In seconds
+    const now = Math.floor(Date.now() / 100); // In seconds
     const fdv = token.fdv || 0;
     const mc = token.marketCap || 0;
     const liquidity = token.liquidity?.usd || 0;
