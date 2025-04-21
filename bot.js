@@ -155,7 +155,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.post('/thresholds', (req, res) => {
   const pass = req.body.pass;
-  if (pass === process.env.USER0 || pass === process.env.USER1) {
+  if (pass == process.env.USER0 || pass == process.env.USER1) {
     const newThresholds = req.body;
     thresholds = { ...thresholds, ...newThresholds };
    
