@@ -55,7 +55,7 @@ function sleep(minMs, maxMs) {
   return new Promise(resolve => setTimeout(resolve, delay));
 }
 
-Initialize the StringSession
+// Initialize the StringSession
 const stringSession = new StringSession(sessionString);
 
 // Create a new Telegram client instance
@@ -68,7 +68,6 @@ const client = new TelegramClient(stringSession, apiId, apiHash, {
 
 // Async function to start the client and authenticate
 (async () => {
-  console.log('Starting Telegram client...');
 
   // Connect the client
   await client.connect();
@@ -101,7 +100,6 @@ const client = new TelegramClient(stringSession, apiId, apiHash, {
 async function sendMessage(messageText) {
   try {
     await client.sendMessage(thresholds.recipientBot, { message: messageText });
-    // console.log(`Message sent to ${recipientBot}: "${messageText}"`);
   } catch (error) {
     // console.error('Error sending message:', error);
     io.emit('notification', {message: "err gramsjs"})
@@ -181,22 +179,6 @@ app.get('/trades-history', (req, res) => {
   res.sendFile(filePath);
 });
 
-async function verifyWithRugcheck(token) {
-  const url = `https://api.rugcheck.xyz/v1/tokens/${token}/report`;
-  try {
-    const response = await robustFetch(url);
-    if (!response.ok) throw new Error(`RugCheck API error: ${response.status}`);
-    const report = await response.json();
-    if (report?.rugged) return false;
-    return token;
-  } catch (err) {
-    io.emit('notification', { message: `⚠️ Error verifying token ${tokenAddress}: ${err.message}` });
-    // console.error('Error verifying rug:', err);
-    return false;
-  }
-}
-
-
 const keepAliveAgent = new https.Agent({ keepAlive: true });
 
 async function robustFetch(url, options = {}) {
@@ -215,6 +197,21 @@ async function robustFetch(url, options = {}) {
     },
     { retries: 3, minTimeout: 1000, factor: 2 },
   );
+}
+
+async function verifyWithRugcheck(token) {
+  const url = `https://api.rugcheck.xyz/v1/tokens/${token}/report`;
+  try {
+    const response = await robustFetch(url);
+    if (!response.ok) throw new Error(`RugCheck API error: ${response.status}`);
+    const report = await response.json();
+    if (report?.rugged) return false;
+    return token;
+  } catch (err) {
+    io.emit('notification', { message: `⚠️ Error verifying token ${tokenAddress}: ${err.message}` });
+    // console.error('Error verifying rug:', err);
+    return false;
+  }
 }
 
 function potentialAddresses(tokens) {
@@ -266,7 +263,7 @@ async function fetchTokenData() {
     return potentialAddresses(newTokens);
   } catch (err) {
     io.emit('notification', { message: `🚨 Error fetching token data: ${err.message}` });
-    // console.error('Error fetching token data:', err);
+    console.error('Error fetching token data:', err);
     return [];
   }
 }
@@ -311,7 +308,7 @@ async function verifyTokens(tokens) {
 async function runAnalyzer() {
   if (!botActive) return;
   io.emit('notification', { message: '📊 Analyzing market data...' });
-  const tokens = await fetchTokenData();
+  const tokens = await fetchTokenData(); 
   await verifyTokens(tokens); 
 }
 
