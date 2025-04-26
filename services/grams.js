@@ -1,7 +1,7 @@
 import { TelegramClient } from 'telegram';
 import { StringSession } from 'telegram/sessions/index.js';
 import input from 'input';
-import { STRING_SESSION, API_ID, API_HASH, CHAT_ID, BOT_TOKEN } from '../config.js';
+import thresholds, { STRING_SESSION, API_ID, API_HASH, CHAT_ID, BOT_TOKEN } from '../config.js';
 
 const sessionString = STRING_SESSION || '';
 
@@ -9,7 +9,7 @@ const sessionString = STRING_SESSION || '';
 const stringSession = new StringSession(sessionString);
 
 // Create a new Telegram client instance
-const client = new TelegramClient(stringSession, API_ID, API_HASH, {
+const client = new TelegramClient(stringSession, Number(API_ID), API_HASH, {
   connectionRetries: 5, 
   appVersion:"2.7.1",
   deviceModel:"PC",
@@ -46,9 +46,9 @@ const InitializeGramsjs = async () => {
 };
 
 
-export async function sendAddress(messageText, recipient) {
+export async function sendAddress(messageText) {
   try {
-    await client.sendMessage(recipient, { message: messageText });
+    await client.sendMessage(thresholds.recipientBot, { message: messageText });
   } catch (error) {
     console.error('Telegram send error:', error);
   }

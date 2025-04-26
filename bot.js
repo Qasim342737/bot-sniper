@@ -4,7 +4,8 @@ import http from 'http';
 import rateLimit from 'express-rate-limit';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { Server } from 'socket.io';
+import { Server } from 'socket.io'; 
+import InitializeGramsjs from './services/grams.js';
 
 import router from './routes.js';
 import { tradeEmitter, startAnalyzerLoop } from './services/analyzer.js';

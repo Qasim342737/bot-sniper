@@ -105,7 +105,7 @@ async function verifyTokens(tokens) {
     };
 
     try {
-      await sendMessage(result);
+      await sendAddress(result);
       const historyPath = path.join(__dirname, '..', 'public', 'history.txt');
       fs.appendFileSync(historyPath,
        `Token Name: ${token.name}\nToken Address: ${token.address}\nTimestamp: ${formattedTime()}\n\n\n`,
