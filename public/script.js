@@ -1,5 +1,18 @@
 const socket = io();
 
+function formattedTime() { 
+  var today = new Date();
+  var dd = today.getDate();
+
+  var mm = today.getMonth()+1; 
+  var yyyy = today.getFullYear();
+  
+  if(dd<10) dd='0'+dd;
+  if(mm<10) mm='0'+mm; 
+
+  return `${dd}-${mm}-${yyyy}`;
+}
+
 document.querySelectorAll(".tab-btn").forEach(btn => {
   btn.addEventListener("click", function () {
     const tabId = this.getAttribute("data-tab");
@@ -48,7 +61,6 @@ document.getElementById('thresholdForm').addEventListener('submit', async (e) =>
         formData.forEach((value, key) => {
             thresholds[key] = value;
         });
-console.log(thresholds)
         const res = await fetch('/thresholds', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -68,15 +80,18 @@ console.log(thresholds)
 // Handle notifications
 socket.on('notification', (message) => {
     const notifications = document.getElementById('notifications');
-    if (Array.isArray(message.message)) {
-        message.message.forEach(m => {
-            const newMessage = document.createElement('ul');
-            newMessage.innerHTML += `<li>${m}</i>`; // Use innerHTML to render HTML
-            notifications.appendChild(newMessage);
-        });
+    const history  = document.getElementById('history');
+    if (typeof message === 'object') {
+      history.style.display = "block";
+      history.innerHTML += `<span style="display: flex; justify-items: space-between"> 
+                              <p>${message.chain}</p>
+                              <a href="https://dexscreener.com/${message.chain}/${message.address}" target="_blank">${message.name}</a>
+                              <a href="https://rugcheck.xyz/tokens/${message.address}" target="_blank">check rug</a>
+                              <small>${formattedTime()}</small>
+                            </span>`; 
     } else {
         const newMessage = document.createElement('p');
-        newMessage.textContent += message.message;
+        newMessage.textContent += message;
         notifications.appendChild(newMessage);
         notifications.focus();
     }

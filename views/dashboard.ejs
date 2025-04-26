@@ -12,8 +12,9 @@
   <div class="container">
     <h1>Trading Dashboard</h1>
     <a href="/logout" target="_blank">LogOut</a> <br/><br/>
-    <a href="/trades-history" target="_blank">Go to Trades history</a>
-
+    <center>
+      <a href="/trades-history" target="_blank">Go to Trades history</a>
+    </center>
     <div class="status">
       <small id="toggleBotStatus">
         <%= toggleBot ? 'BOT running...' : 'BOT is not active 😴' %>
@@ -24,8 +25,8 @@
     </div>
     
     <div style="margin-bottom: 1rem;"> 
-      <button class="tab-btn" data-tab="1">Trade Config</button>
-      <button class="tab-btn" data-tab="2">Trade Settings</button>
+      <button class="tab-btn" data-tab="1">Trade filter</button>
+      <button class="tab-btn" data-tab="2">Trade config</button>
     </div>
 
     <small>Recipient Bot is required in Trade Settings Tab</small>
@@ -36,23 +37,54 @@
           <label for="age">Token age:</label>
           <input type="number" id="age" name="age" value="<%= thresholds.age || 0 %>" required min="0" />
 
-          <label for="liquidity">Liquidity:</label>
-          <input type="number" id="liquidity" name="liquidity" value="<%= thresholds.liquidity || 0 %>" required min="0" />
-
-          <label for="fdv">FDV:</label>
-          <input type="number" id="fdv" name="fdv" value="<%= thresholds.fdv || 0 %>" required min="0" />
-
-          <label for="mc">Market Cap:</label>
-          <input type="number" id="mc" name="mc" value="<%= thresholds.mc || 0 %>" required min="0" />
+          <div class="input-pair">
+            <div>
+              <label for="min-liquidity">Min Liquidity:</label>
+              <input type="number" id="min-liquidity" name="minLiquidity" value="<%= thresholds.minLiquidity || 0 %>" required min="0" />
+            </div>
+            <div>
+              <label for="max-liquidity">Max Liquidity:</label>
+              <input type="number" id="max-liquidity" name="maxLiquidity" value="<%= thresholds.maxLiquidity || 0 %>" required min="0" />
+            </div>
+           </div>
+           
+           <div class="input-pair">
+            <div>
+              <label for="min-fdv">Min FDV:</label>
+              <input type="number" id="min-fdv" name="minFdv" value="<%= thresholds.minFdv || 0 %>" required min="0" />
+            </div>
+            <div>
+              <label for="max-fdv">Max FDV:</label>
+              <input type="number" id="max-fdv" name="maxFdv" value="<%= thresholds.maxFdv || 0 %>" required min="0" />
+            </div>
+           </div>
+           
+           <div class="input-pair">
+            <div>
+              <label for="min-mc">Min Market Cap:</label>
+              <input type="number" id="min-mc" name="minMc" value="<%= thresholds.minMc || 0 %>" required min="0" />
+            </div>
+            <div>
+              <label for="max-mc">Max Market Cap:</label>
+              <input type="number" id="max-mc" name="maxMc" value="<%= thresholds.maxMc || 0 %>" required min="0" />
+            </div>
+           </div>
         </div>
-
+           
         <div id="tab2" style="display: none;">
+          <label for="chain">Select Chain:</label>
+          <select id="chain" name="chain">
+            <option value="solana" default>Solana</option>
+            <option value="BSC">BSC</option> 
+            <option value="Base">Base</option>
+          </select>
+
           <label for="recipientBot">Recipient Bot:</label>
           <input type="text" id="recipientBot" name="recipientBot" value="<%= thresholds.recipientBot || '' %>" required>
 
           <label for="maxTrade">Max Trades:</label>
           <input type="number" id="maxTrade" name="maxTrade" value="<%= thresholds.maxTrade || 0 %>" required min="0" />
-
+        
           <!-- <label for="tradeAmount">Trade Amount In Lamport:</label> -->
           <!-- <input type="number" id="tradeAmount" step="0.000000001" name="tradeAmount" value="<%= thresholds.tradeAmount || 0 %>" required min="0" /> -->
           <!---->
@@ -66,6 +98,10 @@
 
     <h2>Notifications</h2>
     <div id="notifications" tabindex="0"></div>
+  </div>
+
+  <div class="container" style="display: none; justify-items: space-between;" id="history"> 
+    <h1>Trades</h1>
   </div>
 </body>
 </html>
