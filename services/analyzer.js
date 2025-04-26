@@ -117,12 +117,12 @@ async function verifyTokens(tokens) {
       tradeEmitter.emit('tradeUpdate', `🚀 ${token.name} with address of '${token.address}' send to telegram bot successfully!`);
       tradeEmitter.emit('tradeUpdate', token);
       const msg = `🚀 ${token.name} (${formattedTime()})\nAddress: ${token.address}`;
-      await sendNotification(msg);
+      await sendNotification(msg); 
+      tradeEmitter.emit('tradeUpdate', "searching and analyzing 📊");
     } catch (err) {
       tradeEmitter.emit('tradeUpdate', `❌ failed to send ${token.name}: ${err.message}`);
     }
   }
-  tradeEmitter.emit('tradeUpdate', "Analyzing 📊");
 }
 
 export async function startAnalyzerLoop() {
