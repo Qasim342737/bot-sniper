@@ -3,12 +3,14 @@ import { sendNotification, sendAddress } from './grams.js';
 import { formattedTime, robustFetch, sleep  } from '../utils.js';
 import { EventEmitter } from 'events';
 import path from 'path';
-import fs from 'fs';
+import fs from 'fs'; 
+import { fileURLToPath } from 'url';
 
 let botActive = false;
 let sentTokens = 0;
 
 const fetchedTokens = new Set();
+const __dirname = path.dirname(fileURLToPath(import.meta.url)); 
 
 export const tradeEmitter = new EventEmitter();
 export const changeStatus = (status) => { 
