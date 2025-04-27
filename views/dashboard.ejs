@@ -100,8 +100,19 @@
     <div id="notifications" tabindex="0"></div>
   </div>
 
-  <div class="container" style="display: none; justify-items: space-between;" id="history"> 
-    <h1>Trades</h1>
+  <div id="history-table" class="container" style="display: none;> 
+    <h1>Trades</h1> 
+    <table id="history-table" style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+      <thead>
+        <tr>
+          <th>Chain</th>
+          <th>Name</th>
+          <th>Rug Check</th>
+          <th>Time</th>
+        </tr>
+      </thead>
+      <tbody id="history-body"></tbody>
+    </table>
   </div>
 </body>
 </html>
