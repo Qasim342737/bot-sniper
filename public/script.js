@@ -1,17 +1,26 @@
 const socket = io();
 
-function formattedTime() { 
-  var today = new Date();
-  var dd = today.getDate();
-
-  var mm = today.getMonth()+1; 
-  var yyyy = today.getFullYear();
+function formattedTime() {
+  const offset = 1; // Fixed UTC+1
+  const today = new Date();
   
-  if(dd<10) dd='0'+dd;
-  if(mm<10) mm='0'+mm; 
+  let utc = today.getTime() + (today.getTimezoneOffset() * 60000);
 
-  return `${dd}-${mm}-${yyyy}`;
-}
+  let adjustedDate = new Date(utc + (3600000 * offset));
+
+  let dd = adjustedDate.getDate();
+  let mm = adjustedDate.getMonth() + 1;
+  const yyyy = adjustedDate.getFullYear();
+  let hr = adjustedDate.getHours();
+  let m = adjustedDate.getMinutes();
+
+  if (dd < 10) dd = '0' + dd;
+  if (mm < 10) mm = '0' + mm;
+  if (hr < 10) hr = '0' + hr;
+  if (m < 10) m = '0' + m; 
+  
+  return `${dd}-${mm}-${yyyy} ${hr}:${m} UTC+1`;
+} 
 
 document.querySelectorAll(".tab-btn").forEach(btn => {
   btn.addEventListener("click", function () {
