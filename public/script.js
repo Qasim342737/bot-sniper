@@ -90,14 +90,25 @@ document.getElementById('thresholdForm').addEventListener('submit', async (e) =>
 socket.on('notification', (message) => {
     const notifications = document.getElementById('notifications');
     const history  = document.getElementById('history');
-    if (typeof message === 'object') {
-      history.style.display = "block";
-      history.innerHTML += `<span style="display: flex; justify-items: space-between"> 
-                              <p>${message.chain}</p>
-                              <a href="https://dexscreener.com/${message.chain}/${message.address}" target="_blank">${message.name}</a>
-                              <a href="https://rugcheck.xyz/tokens/${message.address}" target="_blank">check rug</a>
-                              <small>${formattedTime()}</small>
-                            </span>`; 
+   
+    if (typeof message === 'object') { 
+      const historyBody = document.getElementById('history-body');
+      history.style.display = "block"; 
+      historyBody.innerHTML += `
+    <tr>
+      <td>${message.chain}</td>
+      <td>
+        <a href="https://dexscreener.com/${message.chain}/${message.address}" target="_blank">
+          ${message.name}
+        </a>
+      </td>
+      <td>
+        <a href="https://rugcheck.xyz/tokens/${message.address}" target="_blank">
+          Check Rug
+        </a>
+      </td>
+      <td>${formattedTime()}</td>
+    </tr>`;
     } else {
         const newMessage = document.createElement('p');
         newMessage.textContent += message;
