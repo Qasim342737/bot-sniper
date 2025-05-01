@@ -114,7 +114,7 @@ async function verifyTokens(tokens) {
       );
 
       sentTokens++;
-      await sleep(4000, 8000);
+      await sleep(3000, 6000);
       tradeEmitter.emit('tradeUpdate', `🚀 ${token.name} with address of '${token.address}' send to telegram bot successfully!`);
       tradeEmitter.emit('tradeUpdate', token);
       const msg = `🚀 ${token.name} (${formattedTime()})\nAddress: ${token.address}`;
