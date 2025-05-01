@@ -12,7 +12,7 @@ let botActive = false;
 
 router.get('/', (req, res) => { 
   const filePath = path.join(__dirname, 'public', 'login Form.html');
-  res.status(200).sendFile('loginForm'); 
+  res.status(200).sendFile(filePath); 
 );
 
 router.get('/bot', (req, res) => {  
