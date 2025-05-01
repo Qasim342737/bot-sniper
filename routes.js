@@ -1,8 +1,7 @@
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import thresholds, { USER0, USER1 } from './config.js';
-import basicAuth from 'express-basic-auth';
+import thresholds, { PASS } from './config.js';
 import { sendNotification } from './services/grams.js';
 import {changeStatus, tradeEmitter, startAnalyzerLoop} from './services/analyzer.js';
 import { formattedTime } from './utils.js';
@@ -11,21 +10,26 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const router = express.Router();
 let botActive = false;
 
-const authMiddleware = basicAuth({
-  users: { 'user0': USER0, 'user1': USER1 },
-  challenge: true,
-  unauthorizedResponse: 'Unauthorized'
+router.get('/', (req, res) => { 
+  const filePath = path.join(__dirname, 'public', 'login Form.html');
+  res.status(200).sendFile('loginForm'); 
+);
+
+router.get('/bot', (req, res) => {  
+  res.redirect('/');
 });
 
-router.get('/bot', authMiddleware, (req, res) => {
-  res.render('dashboard', { toggleBot: botActive, thresholds });
+router.post('/bot', (req, res) => { 
+  if (req.body.user === "owner" && req.body.pass === PASS)
+    res.render('dashboard', { toggleBot: botActive, thresholds }); 
+  else res.redirect('/');
 });
 
 router.post('/thresholds', (req, res) => {
-  if ([USER0, USER1].includes(req.body.pass)) {
+  if (PASS === req.body.pass)) {
     Object.assign(thresholds, req.body);
     
-    sendNotification(`Settings have been changed. ${formattedTime()}`);
+    sendNotification(`🛠️ Settings have been changed. ${formattedTime()}`);
     
     res.json(thresholds);
     console.log(thresholds)
@@ -37,10 +41,6 @@ router.post('/thresholds', (req, res) => {
 router.get('/trades-history', (req, res) => {
   const filePath = path.join(__dirname, 'public', 'history.txt');
   res.sendFile(filePath);
-});
-
-router.get('/logout', (req, res) => {
-  res.status(401).send('You have been logged out.');
 });
 
 router.get('/toggle-bot', (req, res) => {
