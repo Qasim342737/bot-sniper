@@ -1,7 +1,7 @@
 {
   "name": "bot-sniper",
-  "version": "1.0.0",
-  "description": "solana bot sniper",
+  "version": "1.0.1",
+  "description": "bot sniper",
   "main": "bot.js",
   "type": "module",
   "scripts": {
@@ -11,20 +11,14 @@
   "author": "ceo sadiq",
   "license": "ISC",
   "dependencies": {
-    "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "ejs": "^3.1.10",
     "express": "^5.1.0",
-    "express-basic-auth": "^1.2.1",
     "express-rate-limit": "^7.5.0",
     "helmet": "^8.1.0",
-    "i": "^0.3.7",
     "input": "^1.0.1",
-    "npm": "^11.3.0",
     "p-retry": "^6.2.1",
     "socket.io": "^4.8.1",
-    "telegram": "^2.26.22",
-    "web-push": "^3.6.7",
-    "xss-clean": "^0.1.4"
+    "telegram": "^2.26.22"
   }
 }

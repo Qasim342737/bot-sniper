@@ -7,8 +7,7 @@ export const {
   API_HASH,
   STRING_SESSION,
   CHAT_ID,
-  USER0,
-  USER1,
+  PASS
 } = process.env;
 
 const thresholds = {

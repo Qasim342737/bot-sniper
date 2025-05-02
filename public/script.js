@@ -1,5 +1,9 @@
 const socket = io();
 
+const notifications = document.getElementById('notifications');
+const history  = document.getElementById('history');
+const historyBody = document.getElementById('history-body');
+
 function formattedTime() {
   const offset = 1; // Fixed UTC+1
   const today = new Date();
@@ -88,22 +92,18 @@ document.getElementById('thresholdForm').addEventListener('submit', async (e) =>
 
 // Handle notifications
 socket.on('notification', (message) => {
-    const notifications = document.getElementById('notifications');
-    const history  = document.getElementById('history');
-   
     if (typeof message === 'object') { 
-      const historyBody = document.getElementById('history-body');
       history.style.display = "block"; 
       historyBody.innerHTML += `
     <tr>
       <td>${message.chain}</td>
       <td>
-        <a href="https://dexscreener.com/${message.chain}/${message.address}" target="_blank">
+        <a style="margin: 0;" href="https://dexscreener.com/${message.chain}/${message.address}" target="_blank">
           ${message.name}
         </a>
       </td>
       <td>
-        <a href="https://rugcheck.xyz/tokens/${message.address}" target="_blank">
+        <a style="margin: 0;" href="https://rugcheck.xyz/tokens/${message.address}" target="_blank">
           Check Rug
         </a>
       </td>

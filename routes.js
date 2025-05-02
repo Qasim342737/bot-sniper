@@ -11,22 +11,23 @@ const router = express.Router();
 let botActive = false;
 
 router.get('/', (req, res) => { 
-  const filePath = path.join(__dirname, 'public', 'login Form.html');
+  const filePath = path.join(__dirname, 'public', 'loginForm.html');
   res.status(200).sendFile(filePath); 
-);
+});
 
 router.get('/bot', (req, res) => {  
   res.redirect('/');
 });
 
 router.post('/bot', (req, res) => { 
+  if (!req.body) res.redirect('/');
   if (req.body.user === "owner" && req.body.pass === PASS)
     res.render('dashboard', { toggleBot: botActive, thresholds }); 
   else res.redirect('/');
 });
 
 router.post('/thresholds', (req, res) => {
-  if (PASS === req.body.pass)) {
+  if (PASS === req.body.pass) {
     Object.assign(thresholds, req.body);
     
     sendNotification(`🛠️ Settings have been changed. ${formattedTime()}`);
