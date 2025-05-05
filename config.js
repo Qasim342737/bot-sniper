@@ -19,7 +19,7 @@ const thresholds = {
   maxMc: 300000,
   age: 2,
   chain: "solana",
-  recipientBot: "@bonkbot_bot",
+  recipientBot: "@maestro",
   maxTrade: 10,
   slippageBps: 200,
   pollInterval: (1000 * 30),
