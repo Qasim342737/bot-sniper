@@ -30,7 +30,7 @@ main {
 
 .container {
   min-width: 450px;
-  max-height: 680px;
+  max-height: 800px;
   margin: auto;
   background: var(--card-bg);
   border-radius: var(--border-radius);
@@ -45,6 +45,9 @@ h2 {
   margin-bottom: 1rem;
 }
 
+#withdraw {
+  width: 300px;
+}
 a {
   color: var(--accent);
   text-decoration: none;

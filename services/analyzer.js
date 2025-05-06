@@ -5,8 +5,10 @@ import { EventEmitter } from 'events';
 import path from 'path';
 import fs from 'fs'; 
 import { fileURLToPath } from 'url';
+import { swap } from '../transaction/solana.js';
 
 let botActive = false;
+let alternate = false;
 let sentTokens = 0;
 
 const fetchedTokens = new Set();
@@ -15,6 +17,10 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const tradeEmitter = new EventEmitter();
 export const changeStatus = (status) => { 
   botActive = status; 
+};
+
+export const changeAlternate = (status) => { 
+  alternate = status; 
 };
 
 function potentialAddresses(tokens) {
@@ -106,15 +112,20 @@ async function verifyTokens(tokens) {
     };
 
     try {
-      await sendAddress(result);
+      if (alternate && thresholds.chain === "solana") {
+        const hash = await swap(result);
+      }
+
+      else await sendAddress(result);
+      
       const historyPath = path.join(__dirname, '..', 'public', 'history.txt');
       fs.appendFileSync(historyPath,
-       `Token Name: ${token.name}\nToken Address: ${token.address}\nTimestamp: ${formattedTime()}\n\n\n`,
+       `Token Name: ${token.name}\nToken Address: ${token.address}\nTimestamp: ${formattedTime()}\n${alternate ? hash : ""}\n\n`,
        'utf8'
       );
 
       sentTokens++;
-      await sleep(3000, 6000);
+      await sleep(2000, 5000);
       tradeEmitter.emit('tradeUpdate', `🚀 ${token.name} with address of '${token.address}' send to telegram bot successfully!`);
       tradeEmitter.emit('tradeUpdate', token);
       const msg = `🚀 ${token.name} (${formattedTime()})\nAddress: ${token.address}`;

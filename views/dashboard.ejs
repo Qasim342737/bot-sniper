@@ -9,18 +9,37 @@
   <script defer src="/script.js"></script>
 </head>
 <body>
+  <form id="withdraw">
+    <span id="bal"><h1>$SOL <%= bal ? bal : "__.___" %></h1></span>
+    <h2>Withdraw Sol</h2>
+    <input type="number" id="wField" name="amt" step="0.000000001" placeholder="Amount to withdraw" required>
+    <input type="text" name="walletAddress" placeholder="wallet address" required>
+    <input type="text" style="max-width: 300px;" placeholder="Input your password" name="pass" required />
+    <button type="submit">Withdraw</button>
+  </form>
+
   <main>
   <div class="container">
     <h1>Trading Dashboard</h1>
     <center>
       <a href="/trades-history" target="_blank">Go to Trades history</a>
     </center>
+
     <div class="status">
       <small id="toggleBotStatus">
         <%= toggleBot ? 'BOT running...' : 'BOT is not active 😴' %>
       </small>
       <button id="toggleActivateBot">
         <%= toggleBot ? 'Terminate' : 'Activate' %>
+      </button>
+    </div>
+    
+    <div class="status">
+      <small id="toggleAlternativeStatus">
+        <%= alternate ? 'Alternative Mode..' : 'Normal Mode' %>
+      </small>
+      <button id="toggleAlternativeBtn">
+        <%= alternate ? 'switch to normal mode' : 'switch to alternative mode' %>
       </button>
     </div>
     
@@ -85,9 +104,9 @@
           <label for="maxTrade">Max Trades:</label>
           <input type="number" id="maxTrade" name="maxTrade" value="<%= thresholds.maxTrade || 0 %>" required min="0" />
         
-          <!-- <label for="tradeAmount">Trade Amount In Lamport:</label> -->
-          <!-- <input type="number" id="tradeAmount" step="0.000000001" name="tradeAmount" value="<%= thresholds.tradeAmount || 0 %>" required min="0" /> -->
-          <!---->
+          <label for="tradeAmount">Trade Amount In Lamport:</label>
+          <input type="number" id="tradeAmount" step="0.000000001" name="tradeAmount" value="<%= thresholds.tradeAmount || 0 %>" required min="0" />
+
           <label for="pollInterval">Polling Interval (ms):</label>
           <input type="number" id="pollInterval" name="pollInterval" value="<%= thresholds.pollInterval || 0 %>" required min="0" />
         </div>

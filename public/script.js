@@ -1,5 +1,6 @@
 const socket = io();
 
+let loading = false;
 const notifications = document.getElementById('notifications');
 const history  = document.getElementById('history');
 const historyBody = document.getElementById('history-body');
@@ -39,18 +40,18 @@ function tab(id) {
   document.getElementById("tab2").style.display = id === 2 ? "block" : "none";
 }
 
-// const solInput = document.getElementById('tradeAmount');
+const solInput = document.getElementById('tradeAmount');
 
-// solInput.addEventListener('change', () => {
-//   const value = parseFloat(solInput.value);
-//
-//   if (!isNaN(value)) {
-//     const lamports = Math.round(value * 1_000_000_000);
-//     solInput.value = lamports; // Replace input value with lamports
-//   } else {
-//     solInput.value = '';
-//   }
-// });
+solInput.addEventListener('change', () => {
+  const value = parseFloat(solInput.value);
+
+  if (!isNaN(value)) {
+    const lamports = value * 1_000_000_000;
+    solInput.value = lamports; // Replace input value with lamports
+  } else {
+    solInput.value = '';
+  }
+});
 
 // Activate Bot
 document.getElementById('toggleActivateBot').addEventListener('click', async () => {
@@ -65,27 +66,66 @@ document.getElementById('toggleActivateBot').addEventListener('click', async () 
     }
 });
 
+// Activate Bot
+document.getElementById('toggleAlternativeBtn').addEventListener('click', async () => {
+    try {
+        const res = await fetch('/toggle-alternate');
+        if (!res.ok) throw new Error('Network response was not ok');
+        const data = await res.json();
+        document.getElementById('toggleAlternativeStatus').textContent = data.status ? 'Alternative Mode Active..' : 'Normal mode';
+        document.getElementById('toggleAlternativeBtn').textContent = data.status ? 'switch to normal Mode' : 'switch to alternative Mode';
+    } catch (error) {
+        console.error('Error toggling auto trade:', error);
+    }
+});
+
+// Threshold Form Submission
+document.getElementById('withdraw').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    try {
+        const formData = new FormData(e.target);
+        const data = {};
+        formData.forEach((value, key) => {
+            data[key] = value;
+        });
+        loading = true;
+        const res = await fetch('/withdraw', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        
+        loading = false;
+
+        if (!res.ok) alert('success');
+         else alerr("try again later")
+    } catch (error) {
+        alert(error.message);
+    }
+});
+
 // Threshold Form Submission
 document.getElementById('thresholdForm').addEventListener('submit', async (e) => {
     e.preventDefault();
+    if (loading) return;
     try {
         const formData = new FormData(e.target);
         const thresholds = {};
         formData.forEach((value, key) => {
             thresholds[key] = value;
         });
+        loading = true;
         const res = await fetch('/thresholds', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(thresholds)
         });
+        
+        loading = false;
 
         if (!res.ok) throw new Error('Network response was not ok or incorrect password');
-        const updatedThresholds = await res.json();
-        alert('updated') 
-        // console.log('Thresholds updated:', updatedThresholds);
+        alert('updated');
     } catch (error) {
-        // console.error('Error updating thresholds:', error);
         alert(error.message);
     }
 });
