@@ -1,5 +1,18 @@
 const socket = io();
 
+window.onload = (event) => {
+  fetch('/bal')
+    .then(res => res.text())
+    .then(data => {
+      if (!data) return;
+      document.getElementById('bal').innerHTML = "$SOL " + `<span style="color: gray; font-size: 35px;">${data}</span>`;
+      console.log(data);
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    });
+};
+
 let loading = false;
 const notifications = document.getElementById('notifications');
 const history  = document.getElementById('history');

@@ -24,8 +24,7 @@ router.get('/bot', (req, res) => {
 router.post('/bot', async (req, res) => { 
   if (!req.body) res.redirect('/');
   if (req.body.user === "owner" && req.body.pass === PASS) {
-    const bal = await refreshBalance();
-    res.render('dashboard', { toggleBot: botActive, bal, alternate, thresholds }); 
+    res.render('dashboard', { toggleBot: botActive, alternate, thresholds }); 
   }
   else res.redirect('/');
 });
@@ -82,5 +81,10 @@ router.post('/withdraw', async (req, res) => {
   } else res.status(401).send('Unauthorized');
  
 });
+
+router.get("/bal", async (req, res) => {
+  const bal = await refreshBalance();
+  res.send(bal);
+})
 
 export default router;
