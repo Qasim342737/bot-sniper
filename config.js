@@ -8,7 +8,8 @@ export const {
   STRING_SESSION,
   CHAT_ID,
   PASS,
-  SOL_PK
+  SOL_PK,
+  RPC
 } = process.env;
 
 const thresholds = {
@@ -23,7 +24,7 @@ const thresholds = {
   recipientBot: "@maestro",
   maxTrade: 10,
   tradeAmount: 0.006e9,
-  slippageBps: 0.5,
+  slippageBps: 200,
   pollInterval: (1000 * 30),
 };
 

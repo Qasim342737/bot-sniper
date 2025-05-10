@@ -95,6 +95,7 @@ async function verifyWithRugcheck(token) {
 
 async function verifyTokens(tokens) {
   for (const token of tokens) {
+    let hash;
     if (!token.address) continue;
     const result = await verifyWithRugcheck(token.address);
 
@@ -113,7 +114,7 @@ async function verifyTokens(tokens) {
 
     try {
       if (alternate && thresholds.chain === "solana") {
-        const hash = await swap(result);
+        hash = await swap(result);
       }
 
       else await sendAddress(result);
