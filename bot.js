@@ -25,7 +25,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(router);
 
-// InitializeGramsjs();
+InitializeGramsjs();
 tradeEmitter.on('tradeUpdate', (message) => io.emit('notification', message));
 
 server.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
