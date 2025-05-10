@@ -17,6 +17,10 @@
     <input type="password" style="max-width: 300px;" placeholder="Input your password" name="pass" required />
     <button type="submit">Withdraw</button>
   </form>
+ 
+  <center>
+   <button style="background: red;" id="clearNotificationsBtn">Clear notifications</button> 
+  </center>
 
   <main>
   <div class="container">
@@ -126,6 +130,7 @@
           <th>Name</th>
           <th>Rug Check</th>
           <th>Time</th>
+          <th>Sell Mint Token</th>
         </tr>
       </thead>
       <tbody id="history-body"></tbody>
@@ -137,5 +142,43 @@
 
   <h2 style="text-align:center;">LOGS</h2>
   <div id="notifications" tabindex="0"></div>
+ 
+  <div id="sellModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:1000; justify-content:center; align-items:center;">
+  <div style="background:white; padding:20px; border-radius:8px; width:300px; position:relative;">
+    <h3>Confirm Sell</h3>
+    <form id="sellForm">
+      <input type="password" name="pass" placeholder="Enter Password" required style="width:100%; margin-bottom:10px; padding:8px;">
+      <input type="hidden" name="address" id="sellTokenAddress">
+      <button type="submit" >Sell</button>
+      <button type="button" class="sell-btn" data-address="close" style="background: red;">Cancel</button>
+    </form>
+  </div>
+  </div>
+
+  <div id="loadingOverlay" style="
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 2000;
+  justify-content: center;
+  align-items: center;
+">
+  <div class="spinner" style="
+    border: 8px solid #f3f3f3;
+    border-top: 8px solid #3498db;
+    border-radius: 50%;
+    width: 60px; height: 60px;
+    animation: spin 1s linear infinite;
+  "></div>
+</div>
+
+<style>
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+</style>
 </body>
 </html>

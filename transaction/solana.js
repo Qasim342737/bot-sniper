@@ -9,9 +9,18 @@ const senderPrivateKey = bs58.decode(SOL_PK);
 const wallet = new Wallet(Keypair.fromSecretKey(senderPrivateKey));
 
 // GMGN API domain
-const inputMint = 'So11111111111111111111111111111111111111112';
+const sol = 'So11111111111111111111111111111111111111112';
+let outputMint;
+let inputMint;
 
-export async function swap(outputMint) {
+export async function swap(mint, sell = false) {
+  if (sell) {
+    outputMint = sol;
+    inputMint = mint;
+  } else {
+    inputMint = sol;
+    outputMint = mint;
+  }
   // Get quote and unsigned transaction
  const quoteResponse = await (
    await fetch(`https://lite-api.jup.ag/swap/v1/quote?inputMint=${inputMint}&outputMint=${outputMint}&amount=${thresholds.tradeAmount}&slippageBps=${thresholds.slippageBps}`
@@ -51,10 +60,8 @@ export async function swap(outputMint) {
   const confirmation = await connection.confirmTransaction({signature,}, "finalized");
 
   if (confirmation.value.err) {
-    console.log(`Transaction failed: ${JSON.stringify(confirmation.value.err)}\nhttps://solscan.io/tx/${signature}/`);
     return (`Transaction failed: https://solscan.io/tx/${signature}/`);
   } else return (`Transaction successful: https://solscan.io/tx/${signature}/`);
-  console.log("success")
 }
 
 export const refreshBalance = async () => {
@@ -86,10 +93,9 @@ export const withdraw = async (amt, wl) => {
       [wallet.payer]
     );
   
-    return (`Transaction successful: https://solscan.io/tx/${signature}/`);
+    return (`Transaction sent: https://solscan.io/tx/${signature}/`);
   } catch (error) {
     throw 'Transaction failed: ' + error;
   }
 };
 
-swap("AQiuLzWMZgLtuv1C97uwpyq6GvinoTDwUYFSJTQopump")

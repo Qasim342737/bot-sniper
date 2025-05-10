@@ -25,6 +25,10 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(router);
 
+// setInterval(() => {
+//   io.emit('notification', { chain: "solana", name: "testing token", address: "679igdr3e689onbgfrr77ibg" })
+// }, 2000); 
+
 InitializeGramsjs();
 tradeEmitter.on('tradeUpdate', (message) => io.emit('notification', message));
 

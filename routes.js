@@ -5,7 +5,7 @@ import thresholds, { PASS } from './config.js';
 import { sendNotification } from './services/grams.js';
 import { changeAlternate, changeStatus, tradeEmitter, startAnalyzerLoop } from './services/analyzer.js';
 import { formattedTime } from './utils.js';
-import { refreshBalance, withdraw } from './transaction/solana.js';
+import { refreshBalance, withdraw, swap} from './transaction/solana.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const router = express.Router();
@@ -74,9 +74,21 @@ router.post('/withdraw', async (req, res) => {
   if (PASS === req.body.pass) {
     try {
       const success = await withdraw(Number(req.body.amt ) * 1e9, req.body.walletAddress);
-      tradeEmitter.emit('tradeUpdate', success);
+      sendNotification(success);
     } catch(err) {
-      console.log(err);
+      res.status(400).send(err.message)
+    }
+  } else res.status(401).send('Unauthorized');
+ 
+});
+
+router.post('/sell', async (req, res) => {
+  if (PASS === req.body.pass) {
+    try {
+      const success = await swap(req.body.address, true);
+      sendNotification(success);
+    } catch(err) {
+      res.status(400).send(err.message)
     }
   } else res.status(401).send('Unauthorized');
  
