@@ -85,7 +85,7 @@ router.post('/withdraw', async (req, res) => {
 router.post('/sell', async (req, res) => {
   if (PASS === req.body.pass) {
     try {
-      const success = await swap(req.body.address, true);
+      const success = await swap(req.body.address, true, req.body.amt);
       sendNotification(success);
     } catch(err) {
       res.status(400).send(err.message)

@@ -6,15 +6,15 @@ import thresholds, { STRING_SESSION, API_ID, API_HASH, CHAT_ID, BOT_TOKEN } from
 const sessionString = STRING_SESSION || '';
 
 // Initialize the StringSession
-// const stringSession = new StringSession(sessionString);
-//
-// // Create a new Telegram client instance
-// const client = new TelegramClient(stringSession, Number(API_ID), API_HASH, {
-//   connectionRetries: 5, 
-//   appVersion:"2.7.1",
-//   deviceModel:"PC",
-//   systemVersion:"Windows 10"
-// });
+const stringSession = new StringSession(sessionString);
+
+// Create a new Telegram client instance
+const client = new TelegramClient(stringSession, Number(API_ID), API_HASH, {
+  connectionRetries: 5, 
+  appVersion:"2.7.1",
+  deviceModel:"PC",
+  systemVersion:"Windows 10"
+});
 
 // Async function to start the client and authenticate
 const InitializeGramsjs = async () => {

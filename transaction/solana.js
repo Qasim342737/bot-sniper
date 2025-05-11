@@ -12,18 +12,21 @@ const wallet = new Wallet(Keypair.fromSecretKey(senderPrivateKey));
 const sol = 'So11111111111111111111111111111111111111112';
 let outputMint;
 let inputMint;
+let tradeAmount;
 
-export async function swap(mint, sell = false) {
+export async function swap(mint, sell = false, amt) {
   if (sell) {
     outputMint = sol;
     inputMint = mint;
+    tradeAmount = amt || thresholds.tradeAmount;
   } else {
     inputMint = sol;
     outputMint = mint;
+    tradeAmount = thresholds.tradeAmount;
   }
   // Get quote and unsigned transaction
  const quoteResponse = await (
-   await fetch(`https://lite-api.jup.ag/swap/v1/quote?inputMint=${inputMint}&outputMint=${outputMint}&amount=${thresholds.tradeAmount}&slippageBps=${thresholds.slippageBps}`
+   await fetch(`https://lite-api.jup.ag/swap/v1/quote?inputMint=${inputMint}&outputMint=${outputMint}&amount=${tradeAmount}&slippageBps=${thresholds.slippageBps}`
    )
  ).json();
 
