@@ -17,7 +17,8 @@ const io = new Server(server);
 const PORT = process.env.PORT || 3000;
 
 app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+app.use(express.json()); 
+app.set('trust proxy',1); // Trust all proxies
 app.use(helmet());
 app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 60 }));
 app.set('view engine', 'ejs');
