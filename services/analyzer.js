@@ -104,7 +104,8 @@ async function verifyTokens(tokens) {
       continue;
     }
 
-    if (sentTokens >= thresholds.maxTrade) {
+    if (sentTokens >= thresholds.maxTrade) { 
+      SentTokens = 0;
       tradeEmitter.emit('tradeUpdate', "you have reached the max Trade threshold of " + thresholds.maxTrade);
       sendNotification("Reached the max Trade thresholds of " + thresholds.maxTrade + " bot deactivated" + formattedTime());
       botActive = false;  
