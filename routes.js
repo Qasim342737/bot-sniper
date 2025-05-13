@@ -33,7 +33,8 @@ router.post('/thresholds', (req, res) => {
   if (PASS === req.body.pass) {
     Object.assign(thresholds, req.body);
     
-    sendNotification(`🛠️ Settings have been changed. ${formattedTime()}`);
+    sendNotification(`🛠️ Settings have been changed. ${formattedTime()}`); 
+    rest.status(200).send('success');
   } else {
     res.status(401).send('Unauthorized');
   }
@@ -74,7 +75,8 @@ router.post('/withdraw', async (req, res) => {
   if (PASS === req.body.pass) {
     try {
       const success = await withdraw(Number(req.body.amt ) * 1e9, req.body.walletAddress);
-      sendNotification(success);
+      sendNotification(success);  
+      rest.status(200).send(success);
     } catch(err) {
       res.status(400).send(err.message)
     }
@@ -86,7 +88,8 @@ router.post('/sell', async (req, res) => {
   if (PASS === req.body.pass) {
     try {
       const success = await swap(req.body.address, true, req.body.amt);
-      sendNotification(success);
+      sendNotification(success);  
+      rest.status(200).send(success); 
     } catch(err) {
       res.status(400).send(err.message)
     }
