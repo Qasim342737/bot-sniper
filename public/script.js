@@ -154,7 +154,7 @@ document.getElementById('withdraw').addEventListener('submit', async (e) => {
     loading = false;
     hideLoading();
     if (!res.ok) throw new Error(await res.text());
-    else alert('success');
+    else alert(await rest.text());
   } catch (error) {
     alert(error.message);
   }
@@ -261,7 +261,7 @@ document.getElementById('sellForm').addEventListener('submit', async (e) => {
 
     if (!res.ok) throw new Error(await res.text());
     closeSellModal();
-    alert('Sell triggered');
+    alert(await rest.text());
   } catch (error) {
     alert(error.message);
   }
