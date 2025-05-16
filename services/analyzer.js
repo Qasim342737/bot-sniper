@@ -79,7 +79,7 @@ async function fetchTokenData() {
 } 
 
 async function verifyWithRugcheck(token) {
-  const url = `https://api.rugcheck.xyz/v1/tokens/${token}/report`;
+  const url = `https://api.rugcheck.xyz/v1/tokens/${token}/report/summary`;
   try {
     const response = await robustFetch(url);
     if (!response.ok) throw new Error(`RugCheck API error: ${response.status}`);
