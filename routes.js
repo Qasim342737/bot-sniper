@@ -78,7 +78,8 @@ router.post('/withdraw', async (req, res) => {
       sendNotification(success);  
       rest.status(200).send(success);
     } catch(err) {
-      res.status(400).send(err.message)
+      res.status(400).send("unsuccessfully") 
+      console.log(err)
     }
   } else res.status(401).send('Unauthorized');
  
@@ -91,7 +92,8 @@ router.post('/sell', async (req, res) => {
       sendNotification(success);  
       rest.status(200).send(success); 
     } catch(err) {
-      res.status(400).send(err.message)
+      res.status(400).send("unsuccessfull") 
+      console.log(err)
     }
   } else res.status(401).send('Unauthorized');
  
