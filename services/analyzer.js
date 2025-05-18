@@ -84,7 +84,7 @@ async function verifyWithRugcheck(token) {
     const response = await robustFetch(url);
     if (!response.ok) throw new Error(`RugCheck API error: ${response.status}`);
     const report = await response.json();
-    if (report?.rugged) return false;
+    if (report?.risks.some(risk => risk.level === "danger")) return false;
     return token;
   } catch (err) {
     tradeEmitter.emit('tradeUpdate', `⚠️ Error verifying token ${tokenAddress}: ${err.message}`);
